@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interactive Office - Shades, HVAC and Lighting</title>
+  <style>
+    /* Basic layout: fill the window and hide scrollbars */
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      font-family: sans-serif;
+      background: #e3edf6;
+    }
+    #hud {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      right: 8px;
+      background: rgba(255,255,255,0.88);
+      padding: 8px 12px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      color: #102a44;
+      z-index: 10;
+      font-size: 12px;
+      display: grid;
+      grid-template-columns: minmax(240px, 1.4fr) 2fr 1.3fr;
+      grid-gap: 12px;
+      align-items: center;
+    }
+    #hud button {
+      padding: 4px 8px;
+      font-size: 12px;
+    }
+    .hud-section { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+    .hud-title { font-weight: 800; font-size: 15px; letter-spacing: -0.3px; }
+    #narrative { font-size: 12px; color: #2c4a6e; line-height: 1.3; }
+    .device-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+    .metric-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; font-size: 11px; }
+
+    /* Metric card styling for the HUD */
+    .metric-card {
+      background: rgba(255, 255, 255, 0.6);
+      border-radius: 6px;
+      padding: 4px 6px;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+    }
+    .metric-label {
+      font-size: 10px;
+      color: #666;
+      margin-bottom: 1px;
+    }
+    .metric-value {
+      font-size: 13px;
+      font-weight: 800;
+      color: #0e2238;
+    }
+    .controls-col { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; }
+    .controls-col > div { display: flex; gap: 4px; flex-wrap: wrap; }
+  </style>
+</head>
+<body>
+  <!-- Heads up display -->
+  <div id="hud">
+    <div class="hud-section">
+      <div class="hud-title">🎮 Comfort Quest</div>
+      <div id="narrative">🕹️ Control the blinds, thermostat, and lights — keep the occupant happy. Can you crack their comfort code?</div>
+      <div id="mode-badge" style="display:inline-block;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:700;background:#1a6bb5;color:white;align-self:flex-start;">
+        🎮 YOU ARE THE AUTOMATION
+      </div>
+      <div style="margin-top:4px;">
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:#666;margin-bottom:2px;">
+          <span>😊 Aligned</span>
+          <span>😤 Misaligned</span>
+        </div>
+        <div style="background:#e1e7ee;height:8px;border-radius:4px;overflow:hidden;">
+          <div id="annoyance-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#5cb85c,#f0ad4e,#d9534f);transition:width 0.3s;"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hud-section">
+      <div class="device-row">
+        <div class="metric-card"><div class="metric-label">🪟 Shade</div><div class="metric-value" id="val-shade">Up</div></div>
+        <div class="metric-card"><div class="metric-label">🌡 Thermostat</div><div class="metric-value" id="val-therm">22°C</div></div>
+        <div class="metric-card"><div class="metric-label">💡 Lights</div><div class="metric-value" id="val-lights">ON</div></div>
+        <div class="metric-card"><div class="metric-label">❄️ AC</div><div class="metric-value" id="val-ac">OFF</div></div>
+      </div>
+      <div class="metric-row" style="margin-top:4px;">
+        <div><span style="color:#888">PMV</span><br><strong id="val-pmv">0.0</strong></div>
+        <div><span style="color:#888">Temp</span><br><strong id="val-temp">22°C</strong></div>
+        <div><span style="color:#888">CO₂</span><br><strong id="val-co2">400ppm</strong></div>
+        <div><span style="color:#888">Lux</span><br><strong id="val-lux">300</strong></div>
+        <div><span style="color:#888">Humidity</span><br><strong id="val-hum">45%</strong></div>
+        <div><span style="color:#888">Time</span><br><strong id="val-time">08:00</strong></div>
+      </div>
+    </div>
+
+    <div class="controls-col">
+      <div>
+        <button id="shadeBtn">Lower shade</button>
+        <button id="thermBtn">Change thermostat</button>
+        <button id="lightBtn">Dim lights</button>
+      </div>
+      <div id="status" style="font-weight:700;color:#005a92;font-size:11px;">Status: waiting for interaction</div>
+    </div>
+  </div>
+  <!-- Import the simulation module -->
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>
