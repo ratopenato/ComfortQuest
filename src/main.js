@@ -1595,57 +1595,113 @@ function updateACVisual(on) {
 
 // Update the heads‑up display with live simulation metrics and actuator states.
 function updateHUD(simState) {
-  // Update the heads‑up display with live simulation metrics and actuator states.
-  // This function is called every frame and does not mutate the simulation.
+  // Update live metrics and service states.
+  // User-facing service model:
+  // - Shade: Up / Down
+  // - Thermostat: Cool / Neutral / Warm
+  // - Lights: On / Off
+  // - AC is a background consequence of thermostat control, not a user service.
+
   if (!simState) return;
-  // Format time of day into HH:MM (24‑hour clock) and update the time card.
+
+  // ---- Live metrics ----
   const hrs = Math.floor(simState.timeOfDay);
   const mins = Math.floor((simState.timeOfDay % 1) * 60);
-  const timeString = `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
-  if (valTimeEl) valTimeEl.textContent = timeString;
-  // Comfort metrics from the data source.  Round values appropriately.
-  if (valPmvEl) valPmvEl.textContent  = simState.pmv.toFixed(2);
+
+  if (valTimeEl) {
+    valTimeEl.textContent = `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
+  }
+
+  if (valPmvEl)  valPmvEl.textContent  = simState.pmv.toFixed(2);
   if (valTempEl) valTempEl.textContent = `${simState.temperature.toFixed(1)}°C`;
-  if (valCo2El) valCo2El.textContent   = `${Math.round(simState.co2)}ppm`;
-  if (valLuxEl) valLuxEl.textContent   = `${Math.round(simState.illuminance)}`;
-  if (valHumEl) valHumEl.textContent   = `${Math.round(simState.humidity)}%`;
-  // Actuator state cards.  Shade percentage is derived from the current
-  // shade mesh scale; thermostat setpoint and mode come from the
-  // simulation state; lighting and AC states use module globals.
+  if (valCo2El)  valCo2El.textContent  = `${Math.round(simState.co2)}ppm`;
+  if (valLuxEl)  valLuxEl.textContent  = `${Math.round(simState.illuminance)}`;
+  if (valHumEl)  valHumEl.textContent  = `${Math.round(simState.humidity)}%`;
+
+  // ---- Shade state ----
   const shadePct = Math.round(shadeFabric.scale.y * 100);
-  if (valShadeEl) valShadeEl.textContent = shadePct >= 50 ? 'Down' : 'Up';
-  if (valLightsEl) valLightsEl.textContent = switchOn ? 'ON' : 'OFF';
-  if (valAcEl) valAcEl.textContent = acRunning ? 'ON' : 'OFF';
+  const shadeIsDown = shadePct >= 50;
+
+  if (valShadeEl) {
+    valShadeEl.textContent = shadeIsDown ? 'Down' : 'Up';
+  }
+
+  if (shadeBtnEl) {
+    shadeBtnEl.textContent = shadeIsDown ? 'Raise shade' : 'Lower shade';
+  }
+
+  // ---- Lights state ----
+  const lightsAreOn = !!simState.lightsOn;
+
+  // Keep this global aligned because lighting/daylight functions still use it.
+  switchOn = lightsAreOn;
+
+  if (valLightsEl) {
+    valLightsEl.textContent = lightsAreOn ? 'On' : 'Off';
+  }
+
+  if (lightBtnEl) {
+    lightBtnEl.textContent = lightsAreOn ? 'Turn lights off' : 'Turn lights on';
+  }
+
+  // ---- Thermostat state ----
+  // Thermostat is presented as a thermal direction, not as AC on/off.
+  let thermState = 'Neutral';
+
+  if (simState.thermostatSetpoint === null) {
+    thermState = 'Neutral';
+  } else if (simState.thermostatSetpoint <= 21) {
+    thermState = 'Cool';
+  } else if (simState.thermostatSetpoint >= 23) {
+    thermState = 'Warm';
+  }
+
   if (valThermEl) {
-    valThermEl.textContent = simState.thermostatSetpoint == null
-      ? 'OFF'
-      : `${simState.thermostatSetpoint.toFixed(1)}°C`;
+    valThermEl.textContent = thermState;
   }
-  if (annoyanceBarEl) annoyanceBarEl.style.width = `${(simState.occupant.patience01 * 100).toFixed(0)}%`;
-  // Narrative reacts to the occupant's FSM state without revealing prefs.
+
+  if (thermBtnEl) {
+    thermBtnEl.textContent = thermState === 'Warm' ? 'Make cooler' : 'Make warmer';
+  }
+
+  // ---- AC hidden compatibility field ----
+  // AC is not exposed as an independent user-controlled service.
+  // Keep the hidden val-ac field empty so older references do not fail.
+  if (valAcEl) {
+    valAcEl.textContent = '';
+  }
+
+  // ---- Misalignment / annoyance ----
+  if (valAnnoyanceEl) {
+    valAnnoyanceEl.textContent = `${Math.round(annoyance * 100)}%`;
+  }
+
+  if (annoyanceBarEl) {
+    annoyanceBarEl.style.width = `${Math.round(annoyance * 100)}%`;
+  }
+
+  // ---- Narrative ----
   if (narrativeEl) {
-    let narrative;
-    if (simState.occupant.state === 'overriding') {
-      narrative = '😤 Too late — they got up to fix it themselves.';
-    } else if (simState.occupant.state === 'annoyed') {
-      narrative = '⚠️ Something\'s off. Try a different setting before they snap.';
-    } else if (simState.pmv > 0.6) {
-      narrative = '🔥 It\'s getting warm in here — act fast.';
-    } else if (simState.pmv < -0.6) {
-      narrative = '🥶 Brr! Warm it up.';
+    if (state !== 'idle') {
+      narrativeEl.textContent =
+        '🙋 Occupant is overriding a service because the automation is misaligned.';
+    } else if (simState.occupant?.state === 'annoyed') {
+      narrativeEl.textContent =
+        '⚠️ Occupant is becoming uncomfortable. Try another service state.';
+    } else if (shadeIsDown) {
+      narrativeEl.textContent =
+        '🪟 Shade is down. Good for glare, but the occupant may prefer daylight.';
     } else {
-      narrative = '🕹️ Control the blinds, thermostat, and lights — keep the occupant happy. Can you crack their comfort code?';
+      narrativeEl.textContent =
+        '😊 Services aligned with the occupant.';
     }
-    narrativeEl.textContent = narrative;
   }
-  // Mode badge highlights when the occupant has taken over.
+
+  // ---- Mode badge ----
   if (modeBadgeEl) {
-    if (simState.occupant.state === 'overriding') {
+    if (state !== 'idle' || simState.occupantOverride) {
       modeBadgeEl.style.background = '#d35400';
-      modeBadgeEl.textContent = '🙋 OCCUPANT OVERRIDING YOU';
-    } else if (simState.occupant.state === 'annoyed') {
-      modeBadgeEl.style.background = '#c0922a';
-      modeBadgeEl.textContent = '⚠️ OCCUPANT GETTING ANNOYED';
+      modeBadgeEl.textContent = '🙋 OCCUPANT OVERRIDE';
     } else {
       modeBadgeEl.style.background = '#1a6bb5';
       modeBadgeEl.textContent = '🎮 YOU ARE THE AUTOMATION';
