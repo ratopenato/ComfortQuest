@@ -7,11 +7,13 @@
 
   <style>
     :root {
-      --panel-bg: rgba(255, 255, 255, 0.92);
+      --panel-bg: rgba(255, 255, 255, 0.93);
       --panel-border: rgba(15, 36, 56, 0.10);
       --text-main: #0f2438;
       --text-muted: #5b6f82;
       --blue: #1a6bb5;
+      --green: #2f9e68;
+      --orange: #d35400;
       --shadow: 0 8px 22px rgba(15, 36, 56, 0.14);
     }
 
@@ -40,14 +42,14 @@
       position: fixed;
       top: 10px;
       left: 10px;
-      right: 190px;
+      right: 10px;
       z-index: 10;
       display: grid;
-      grid-template-columns: 1.1fr 1.7fr;
+      grid-template-columns: 1.22fr 1.55fr 0.9fr;
       gap: 12px;
       align-items: center;
       padding: 12px 14px;
-      border-radius: 12px;
+      border-radius: 10px;
       background: var(--panel-bg);
       border: 1px solid var(--panel-border);
       box-shadow: var(--shadow);
@@ -107,21 +109,19 @@
 
     #annoyance-bar,
     #alignment-fill {
-      display: block;
       height: 100%;
-      width: 35%;
+      width: 0%;
       background: rgba(255, 255, 255, 0.55);
-      transition: width 220ms ease;
     }
 
     .cards {
       display: grid;
-      grid-template-columns: repeat(4, minmax(110px, 1fr));
+      grid-template-columns: repeat(3, minmax(130px, 1fr));
       gap: 8px;
     }
 
     .metric-card {
-      background: rgba(255, 255, 255, 0.72);
+      background: rgba(255, 255, 255, 0.74);
       border: 1px solid rgba(0, 0, 0, 0.08);
       border-radius: 8px;
       padding: 7px 9px;
@@ -141,9 +141,13 @@
       color: var(--text-main);
     }
 
+    #card-ac {
+      display: none !important;
+    }
+
     .metrics {
       display: grid;
-      grid-template-columns: repeat(7, 1fr);
+      grid-template-columns: repeat(6, 1fr);
       gap: 8px;
       margin-top: 8px;
       font-size: 11px;
@@ -160,36 +164,22 @@
       margin-top: 2px;
     }
 
-    #controls-panel {
-      position: fixed;
-      top: 12px;
-      right: 10px;
-      z-index: 25;
-      width: 160px;
-      padding: 10px;
-      border-radius: 12px;
-      background: var(--panel-bg);
-      border: 1px solid var(--panel-border);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(8px);
-    }
-
     .controls {
-      display: grid;
-      grid-template-columns: 1fr;
+      display: flex;
+      flex-wrap: wrap;
       gap: 8px;
+      align-items: center;
     }
 
     button {
       border: 1px solid #c9d3dc;
-      border-radius: 9px;
+      border-radius: 7px;
       background: #f7f8fa;
       color: #172b3a;
-      font-weight: 700;
-      padding: 8px 10px;
+      font-weight: 650;
+      padding: 7px 10px;
       cursor: pointer;
       font: inherit;
-      min-height: 38px;
     }
 
     button:hover {
@@ -211,7 +201,6 @@
       color: #005a92;
       font-weight: 850;
       font-size: 12px;
-      line-height: 1.3;
     }
 
     #credit-footer {
@@ -239,32 +228,17 @@
 
     @media (max-width: 1050px) {
       #hud {
-        right: 10px;
         grid-template-columns: 1fr;
-        max-height: 45vh;
+        max-height: 46vh;
         overflow-y: auto;
       }
 
-      #controls-panel {
-        top: auto;
-        right: 10px;
-        left: 10px;
-        bottom: 34px;
-        width: auto;
-      }
-
-      .controls {
-        grid-template-columns: repeat(3, 1fr);
-      }
-
       .cards {
-        grid-template-columns: repeat(4, minmax(100px, 1fr));
-        overflow-x: auto;
+        grid-template-columns: repeat(3, minmax(110px, 1fr));
       }
 
       .metrics {
-        grid-template-columns: repeat(7, minmax(70px, 1fr));
-        overflow-x: auto;
+        grid-template-columns: repeat(3, 1fr);
       }
     }
 
@@ -280,7 +254,7 @@
         left: 8px;
         right: 8px;
         display: block;
-        max-height: 26vh;
+        max-height: 42vh;
         overflow-y: auto;
         padding: 10px;
         border-radius: 14px;
@@ -289,11 +263,13 @@
 
       #hud h1 {
         font-size: 16px;
-        margin-bottom: 3px;
+        margin-bottom: 4px;
       }
 
       #hud p {
-        display: none;
+        font-size: 12px;
+        line-height: 1.25;
+        margin-bottom: 6px;
       }
 
       #mode-badge {
@@ -303,7 +279,7 @@
 
       #narrative {
         font-size: 11px;
-        min-height: 14px;
+        min-height: 16px;
         margin-top: 6px;
       }
 
@@ -312,7 +288,8 @@
       }
 
       .cards {
-        grid-template-columns: repeat(4, minmax(84px, 1fr));
+        display: grid;
+        grid-template-columns: repeat(3, minmax(96px, 1fr));
         overflow-x: auto;
         gap: 6px;
         padding-bottom: 4px;
@@ -326,25 +303,25 @@
       }
 
       .metric-card {
-        min-width: 84px;
-        padding: 5px 6px;
-        min-height: 36px;
+        min-width: 96px;
+        padding: 6px;
       }
 
       .metric-label {
-        font-size: 9px;
+        font-size: 10px;
       }
 
       .metric-value {
-        font-size: 12px;
+        font-size: 13px;
       }
 
       .metrics {
-        grid-template-columns: repeat(7, minmax(58px, 1fr));
+        display: grid;
+        grid-template-columns: repeat(6, minmax(68px, 1fr));
         overflow-x: auto;
         gap: 6px;
         padding-bottom: 4px;
-        margin-top: 5px;
+        margin-top: 6px;
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none;
       }
@@ -354,84 +331,87 @@
       }
 
       .metrics div {
-        min-width: 58px;
+        min-width: 68px;
       }
 
       .metrics span {
-        font-size: 9px;
-      }
-
-      .metrics strong {
         font-size: 10px;
       }
 
-      #controls-panel {
-        top: auto;
-        left: 10px;
-        right: 10px;
-        bottom: calc(28px + env(safe-area-inset-bottom));
-        width: auto;
-        padding: 8px;
-        border-radius: 16px;
+      .metrics strong {
+        font-size: 11px;
       }
 
       .controls {
+        position: fixed;
+        left: 8px;
+        right: 8px;
+        bottom: calc(30px + env(safe-area-inset-bottom));
+        z-index: 30;
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 7px;
+        grid-template-columns: 1fr;
+        gap: 8px;
+        padding: 10px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.94);
+        border: 1px solid var(--panel-border);
+        box-shadow: 0 8px 24px rgba(15, 36, 56, 0.18);
+        backdrop-filter: blur(8px);
       }
 
       button {
         width: 100%;
-        min-height: 42px;
-        font-size: 11.5px;
-        line-height: 1.15;
-        padding: 8px 6px;
-        border-radius: 12px;
+        min-height: 44px;
+        font-size: 14px;
+        border-radius: 10px;
       }
 
       #status {
-        margin-top: 7px;
-        padding: 0 2px;
+        position: fixed;
+        left: 10px;
+        right: 10px;
+        bottom: calc(184px + env(safe-area-inset-bottom));
+        z-index: 31;
+        margin: 0;
+        padding: 6px 8px;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.92);
+        border: 1px solid var(--panel-border);
+        box-shadow: 0 4px 14px rgba(15, 36, 56, 0.10);
         font-size: 11px;
-        text-align: center;
       }
 
       #credit-footer {
-        bottom: calc(5px + env(safe-area-inset-bottom));
-        font-size: 10.5px;
-        opacity: 0.78;
+        bottom: calc(6px + env(safe-area-inset-bottom));
+        font-size: 11px;
       }
     }
 
     @media (max-width: 420px) {
       #hud {
-        max-height: 24vh;
+        max-height: 38vh;
       }
 
-      .metric-card {
-        min-width: 78px;
+      .controls {
+        bottom: calc(28px + env(safe-area-inset-bottom));
       }
 
-      button {
-        font-size: 11px;
+      #status {
+        bottom: calc(182px + env(safe-area-inset-bottom));
       }
     }
 
     @media (orientation: landscape) and (max-height: 520px) {
       #hud {
-        max-height: 34vh;
-        right: 44%;
-      }
-
-      #controls-panel {
-        left: 58%;
-        right: 8px;
-        bottom: calc(8px + env(safe-area-inset-bottom));
+        max-height: 36vh;
       }
 
       .controls {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      #status {
+        bottom: calc(88px + env(safe-area-inset-bottom));
       }
     }
   </style>
@@ -441,14 +421,13 @@
   <div id="hud">
     <section>
       <h1>🎮 Comfort Quest</h1>
-      <p>🤖 Control the blinds, thermostat, and lights — keep the occupant happy. Can you crack their comfort code?</p>
+      <p>🤖 Control shade, thermostat, and lights. Keep the occupant comfortable by avoiding unnecessary overrides.</p>
       <div id="mode-badge">🎮 YOU ARE THE AUTOMATION</div>
-      <div id="narrative">😊 Aligned</div>
+      <div id="narrative">😊 Services aligned with the occupant.</div>
       <div class="alignment-row">
         <span>😊 Aligned</span>
         <div id="alignment-bar">
-          <div id="annoyance-bar"></div>
-          <div id="alignment-fill" aria-hidden="true"></div>
+          <div id="annoyance-bar"><div id="alignment-fill"></div></div>
         </div>
         <span>🫣 Misaligned <strong id="val-annoyance">0%</strong></span>
       </div>
@@ -462,15 +441,15 @@
         </div>
         <div class="metric-card" id="card-therm">
           <div class="metric-label">🌡 Thermostat</div>
-          <div class="metric-value" id="val-therm">22°C</div>
+          <div class="metric-value" id="val-therm">Neutral</div>
         </div>
         <div class="metric-card" id="card-lights">
           <div class="metric-label">💡 Lights</div>
-          <div class="metric-value" id="val-lights">ON</div>
+          <div class="metric-value" id="val-lights">On</div>
         </div>
-        <div class="metric-card" id="card-ac">
-          <div class="metric-label">❄️ AC</div>
-          <div class="metric-value" id="val-ac">OFF</div>
+        <div class="metric-card" id="card-ac" aria-hidden="true">
+          <div class="metric-label">Hidden compatibility field</div>
+          <div class="metric-value" id="val-ac"></div>
         </div>
       </div>
 
@@ -483,15 +462,15 @@
         <div><span>Time</span><strong id="val-time">08:00</strong></div>
       </div>
     </section>
-  </div>
 
-  <div id="controls-panel">
-    <div class="controls">
-      <button id="shadeBtn">Lower shade</button>
-      <button id="thermBtn">Thermostat</button>
-      <button id="lightBtn">Dim lights</button>
-    </div>
-    <div id="status">Status: waiting for interaction</div>
+    <section>
+      <div class="controls">
+        <button id="shadeBtn">Lower shade</button>
+        <button id="thermBtn">Make warmer</button>
+        <button id="lightBtn">Turn lights off</button>
+      </div>
+      <div id="status">Status: waiting for interaction</div>
+    </section>
   </div>
 
   <footer id="credit-footer">
@@ -509,6 +488,95 @@
     }
   }
   </script>
+
   <script type="module" src="./src/main.js"></script>
+
+  <script>
+    /*
+      UI consistency layer.
+      This script only normalises user-facing text. It does not change the
+      simulation logic in src/main.js. The goal is to avoid inconsistent labels:
+      - Shade button changes between Lower/Raise.
+      - Lights are strictly On/Off, not "dim".
+      - Thermostat is Warm/Cool, not an AC on/off service.
+      - AC card is hidden because AC is not an independent service in this UI.
+    */
+    (function () {
+      const $ = (id) => document.getElementById(id);
+
+      function parseNumber(text) {
+        const match = String(text || '').match(/-?\d+(\.\d+)?/);
+        return match ? Number(match[0]) : NaN;
+      }
+
+      function normaliseUI() {
+        const shadeVal = $('val-shade');
+        const thermVal = $('val-therm');
+        const lightsVal = $('val-lights');
+        const acVal = $('val-ac');
+        const shadeBtn = $('shadeBtn');
+        const thermBtn = $('thermBtn');
+        const lightBtn = $('lightBtn');
+        const narrative = $('narrative');
+
+        // Shade: express as Up/Down and set the next available action.
+        let shadeText = shadeVal ? shadeVal.textContent.trim() : '';
+        let shadeNumber = parseNumber(shadeText);
+        let shadeIsDown =
+          /down/i.test(shadeText) ||
+          (!Number.isNaN(shadeNumber) && shadeNumber >= 50);
+
+        if (shadeVal) shadeVal.textContent = shadeIsDown ? 'Down' : 'Up';
+        if (shadeBtn) shadeBtn.textContent = shadeIsDown ? 'Raise shade' : 'Lower shade';
+
+        // Lights: strict On/Off service. No "dim" language in user-facing UI.
+        let lightsText = lightsVal ? lightsVal.textContent.trim() : '';
+        let lightsAreOn = !/off/i.test(lightsText);
+        if (lightsVal) lightsVal.textContent = lightsAreOn ? 'On' : 'Off';
+        if (lightBtn) lightBtn.textContent = lightsAreOn ? 'Turn lights off' : 'Turn lights on';
+
+        // Thermostat: present as thermal direction, not as AC control.
+        // The existing model may expose a numeric setpoint; map it to Cool/Neutral/Warm.
+        let thermText = thermVal ? thermVal.textContent.trim() : '';
+        let setpoint = parseNumber(thermText);
+        let thermState = 'Neutral';
+
+        if (/cool|cold/i.test(thermText)) thermState = 'Cool';
+        if (/warm|heat|hot/i.test(thermText)) thermState = 'Warm';
+
+        if (!Number.isNaN(setpoint)) {
+          if (setpoint <= 21.0) thermState = 'Cool';
+          else if (setpoint >= 23.0) thermState = 'Warm';
+          else thermState = 'Neutral';
+        }
+
+        if (thermVal) thermVal.textContent = thermState;
+        if (thermBtn) thermBtn.textContent = thermState === 'Warm' ? 'Make cooler' : 'Make warmer';
+
+        // AC is not an independent service in the game. Keep compatibility field empty.
+        if (acVal) acVal.textContent = '';
+
+        if (narrative && narrative.textContent.toLowerCase().includes('ac')) {
+          narrative.textContent = narrative.textContent.replace(/\bAC\b/g, 'thermostat');
+        }
+      }
+
+      // Use both MutationObserver and requestAnimationFrame because src/main.js updates
+      // these fields continuously.
+      const observer = new MutationObserver(() => normaliseUI());
+      window.addEventListener('DOMContentLoaded', () => {
+        ['val-shade', 'val-therm', 'val-lights', 'val-ac'].forEach((id) => {
+          const el = $(id);
+          if (el) observer.observe(el, { childList: true, subtree: true, characterData: true });
+        });
+
+        function loop() {
+          normaliseUI();
+          requestAnimationFrame(loop);
+        }
+        loop();
+      });
+    })();
+  </script>
 </body>
 </html>
