@@ -3,112 +3,261 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Interactive Office - Shades, HVAC and Lighting</title>
+  <title>Comfort Quest</title>
   <style>
-    /* Basic layout: fill the window and hide scrollbars */
     html, body {
       margin: 0;
       padding: 0;
+      width: 100%;
       height: 100%;
       overflow: hidden;
-      font-family: sans-serif;
-      background: #e3edf6;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #dfeaf3;
+      color: #0f2438;
     }
+
+    canvas { display: block; }
+
     #hud {
-      position: absolute;
-      top: 8px;
-      left: 8px;
-      right: 8px;
-      background: rgba(255,255,255,0.88);
-      padding: 8px 12px;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      color: #102a44;
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      right: 10px;
       z-index: 10;
-      font-size: 12px;
       display: grid;
-      grid-template-columns: minmax(240px, 1.4fr) 2fr 1.3fr;
-      grid-gap: 12px;
+      grid-template-columns: 1.2fr 1.65fr 0.9fr;
+      gap: 12px;
+      align-items: center;
+      padding: 12px 14px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.92);
+      box-shadow: 0 8px 22px rgba(15, 36, 56, 0.14);
+      backdrop-filter: blur(8px);
+      font-size: 13px;
+    }
+
+    #hud h1 {
+      margin: 0 0 4px;
+      font-size: 18px;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+
+    #hud p {
+      margin: 0 0 8px;
+      line-height: 1.25;
+    }
+
+    #mode-badge {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #1a6bb5;
+      color: #fff;
+      font-weight: 800;
+      font-size: 12px;
+    }
+
+    #narrative {
+      margin-top: 8px;
+      font-size: 12px;
+      color: #476176;
+      min-height: 18px;
+    }
+
+    .alignment-row {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 8px;
+      align-items: center;
+      margin-top: 8px;
+      font-size: 12px;
+      color: #425466;
+    }
+
+    #alignment-bar {
+      height: 8px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #3fbf7f 0%, #f7c948 55%, #e76f51 100%);
+      overflow: hidden;
+      position: relative;
+    }
+
+    #alignment-fill {
+      height: 100%;
+      width: 35%;
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(120px, 1fr));
+      gap: 8px;
+    }
+
+    .metric-card {
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 8px;
+      padding: 7px 9px;
+      min-height: 42px;
+    }
+
+    .metric-label {
+      font-size: 11px;
+      color: #6b7b88;
+      margin-bottom: 2px;
+    }
+
+    .metric-value {
+      font-size: 15px;
+      line-height: 1.1;
+      font-weight: 850;
+      color: #0f2438;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+      margin-top: 8px;
+      font-size: 11px;
+    }
+
+    .metrics span { color: #6b7b88; }
+
+    .metrics strong {
+      display: block;
+      color: #0f2438;
+      font-size: 12px;
+      margin-top: 2px;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
       align-items: center;
     }
-    #hud button {
-      padding: 4px 8px;
+
+    button {
+      border: 1px solid #c9d3dc;
+      border-radius: 7px;
+      background: #f7f8fa;
+      color: #172b3a;
+      font-weight: 650;
+      padding: 7px 10px;
+      cursor: pointer;
+    }
+
+    button:hover { background: #eef3f7; }
+
+    button:disabled {
+      opacity: 0.45;
+      cursor: default;
+    }
+
+    #status {
+      margin-top: 8px;
+      color: #005a92;
+      font-weight: 850;
       font-size: 12px;
     }
-    .hud-section { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-    .hud-title { font-weight: 800; font-size: 15px; letter-spacing: -0.3px; }
-    #narrative { font-size: 12px; color: #2c4a6e; line-height: 1.3; }
-    .device-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
-    .metric-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; font-size: 11px; }
 
-    /* Metric card styling for the HUD */
-    .metric-card {
-      background: rgba(255, 255, 255, 0.6);
-      border-radius: 6px;
-      padding: 4px 6px;
-      border: 1px solid rgba(0, 0, 0, 0.08);
+    #credit-footer {
+      position: fixed;
+      bottom: 10px;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      z-index: 20;
+      font-size: 12px;
+      color: rgba(15, 36, 56, 0.75);
+      pointer-events: none;
     }
-    .metric-label {
-      font-size: 10px;
-      color: #666;
-      margin-bottom: 1px;
-    }
-    .metric-value {
-      font-size: 13px;
+
+    #credit-footer a {
+      color: rgba(0, 90, 146, 0.95);
       font-weight: 800;
-      color: #0e2238;
+      text-decoration: none;
+      pointer-events: auto;
     }
-    .controls-col { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; }
-    .controls-col > div { display: flex; gap: 4px; flex-wrap: wrap; }
+
+    #credit-footer a:hover { text-decoration: underline; }
+
+    @media (max-width: 1050px) {
+      #hud {
+        grid-template-columns: 1fr;
+        max-height: 44vh;
+        overflow-y: auto;
+      }
+      .cards { grid-template-columns: repeat(2, minmax(120px, 1fr)); }
+      .metrics { grid-template-columns: repeat(3, 1fr); }
+    }
   </style>
 </head>
+
 <body>
-  <!-- Heads up display -->
   <div id="hud">
-    <div class="hud-section">
-      <div class="hud-title">🎮 Comfort Quest</div>
-      <div id="narrative">🕹️ Control the blinds, thermostat, and lights — keep the occupant happy. Can you crack their comfort code?</div>
-      <div id="mode-badge" style="display:inline-block;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:700;background:#1a6bb5;color:white;align-self:flex-start;">
-        🎮 YOU ARE THE AUTOMATION
+    <section>
+      <h1>🎮 Comfort Quest</h1>
+      <p>🤖 Control the blinds, thermostat, and lights — keep the occupant happy. Can you crack their comfort code?</p>
+      <div id="mode-badge">🎮 YOU ARE THE AUTOMATION</div>
+      <div id="narrative">😊 Aligned</div>
+      <div class="alignment-row">
+        <span>😊 Aligned</span>
+        <div id="alignment-bar"><div id="alignment-fill"></div></div>
+        <span>🫣 Misaligned</span>
       </div>
-      <div style="margin-top:4px;">
-        <div style="display:flex;justify-content:space-between;font-size:10px;color:#666;margin-bottom:2px;">
-          <span>😊 Aligned</span>
-          <span>😤 Misaligned</span>
-        </div>
-        <div style="background:#e1e7ee;height:8px;border-radius:4px;overflow:hidden;">
-          <div id="annoyance-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#5cb85c,#f0ad4e,#d9534f);transition:width 0.3s;"></div>
-        </div>
-      </div>
-    </div>
+    </section>
 
-    <div class="hud-section">
-      <div class="device-row">
-        <div class="metric-card"><div class="metric-label">🪟 Shade</div><div class="metric-value" id="val-shade">Up</div></div>
-        <div class="metric-card"><div class="metric-label">🌡 Thermostat</div><div class="metric-value" id="val-therm">22°C</div></div>
-        <div class="metric-card"><div class="metric-label">💡 Lights</div><div class="metric-value" id="val-lights">ON</div></div>
-        <div class="metric-card"><div class="metric-label">❄️ AC</div><div class="metric-value" id="val-ac">OFF</div></div>
+    <section>
+      <div class="cards">
+        <div class="metric-card" id="card-shade">
+          <div class="metric-label">🪟 Shade</div>
+          <div class="metric-value" id="val-shade">Up</div>
+        </div>
+        <div class="metric-card" id="card-therm">
+          <div class="metric-label">🌡 Thermostat</div>
+          <div class="metric-value" id="val-therm">22°C</div>
+        </div>
+        <div class="metric-card" id="card-lights">
+          <div class="metric-label">💡 Lights</div>
+          <div class="metric-value" id="val-lights">ON</div>
+        </div>
+        <div class="metric-card" id="card-ac">
+          <div class="metric-label">❄️ AC</div>
+          <div class="metric-value" id="val-ac">OFF</div>
+        </div>
       </div>
-      <div class="metric-row" style="margin-top:4px;">
-        <div><span style="color:#888">PMV</span><br><strong id="val-pmv">0.0</strong></div>
-        <div><span style="color:#888">Temp</span><br><strong id="val-temp">22°C</strong></div>
-        <div><span style="color:#888">CO₂</span><br><strong id="val-co2">400ppm</strong></div>
-        <div><span style="color:#888">Lux</span><br><strong id="val-lux">300</strong></div>
-        <div><span style="color:#888">Humidity</span><br><strong id="val-hum">45%</strong></div>
-        <div><span style="color:#888">Time</span><br><strong id="val-time">08:00</strong></div>
-      </div>
-    </div>
 
-    <div class="controls-col">
-      <div>
+      <div class="metrics">
+        <div><span>PMV</span><strong id="val-pmv">0.0</strong></div>
+        <div><span>Temp</span><strong id="val-temp">22°C</strong></div>
+        <div><span>CO₂</span><strong id="val-co2">400ppm</strong></div>
+        <div><span>Lux</span><strong id="val-lux">300</strong></div>
+        <div><span>Humidity</span><strong id="val-hum">45%</strong></div>
+        <div><span>Time</span><strong id="val-time">08:00</strong></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="controls">
         <button id="shadeBtn">Lower shade</button>
         <button id="thermBtn">Change thermostat</button>
         <button id="lightBtn">Dim lights</button>
       </div>
-      <div id="status" style="font-weight:700;color:#005a92;font-size:11px;">Status: waiting for interaction</div>
-    </div>
+      <div id="status">Status: waiting for interaction</div>
+    </section>
   </div>
-  <!-- Import the simulation module -->
+
+  <footer id="credit-footer">
+    Developed by
+    <a href="https://pablomartinezalcaraz.com/" target="_blank" rel="noopener noreferrer">
+      Rato Penato
+    </a>
+  </footer>
+
   <script type="importmap">
   {
     "imports": {
@@ -117,7 +266,6 @@
     }
   }
   </script>
-  
   <script type="module" src="./src/main.js"></script>
 </body>
 </html>
