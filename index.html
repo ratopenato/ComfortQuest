@@ -12,7 +12,6 @@
       --text-main: #0f2438;
       --text-muted: #5b6f82;
       --blue: #1a6bb5;
-      --orange: #d35400;
       --shadow: 0 8px 22px rgba(15, 36, 56, 0.14);
     }
 
@@ -41,14 +40,14 @@
       position: fixed;
       top: 10px;
       left: 10px;
-      right: 10px;
+      right: 190px;
       z-index: 10;
       display: grid;
-      grid-template-columns: 1.2fr 1.65fr 0.9fr;
+      grid-template-columns: 1.1fr 1.7fr;
       gap: 12px;
       align-items: center;
       padding: 12px 14px;
-      border-radius: 10px;
+      border-radius: 12px;
       background: var(--panel-bg);
       border: 1px solid var(--panel-border);
       box-shadow: var(--shadow);
@@ -106,15 +105,18 @@
       position: relative;
     }
 
+    #annoyance-bar,
     #alignment-fill {
+      display: block;
       height: 100%;
       width: 35%;
       background: rgba(255, 255, 255, 0.55);
+      transition: width 220ms ease;
     }
 
     .cards {
       display: grid;
-      grid-template-columns: repeat(4, minmax(120px, 1fr));
+      grid-template-columns: repeat(4, minmax(110px, 1fr));
       gap: 8px;
     }
 
@@ -141,7 +143,7 @@
 
     .metrics {
       display: grid;
-      grid-template-columns: repeat(6, 1fr);
+      grid-template-columns: repeat(7, 1fr);
       gap: 8px;
       margin-top: 8px;
       font-size: 11px;
@@ -158,22 +160,36 @@
       margin-top: 2px;
     }
 
+    #controls-panel {
+      position: fixed;
+      top: 12px;
+      right: 10px;
+      z-index: 25;
+      width: 160px;
+      padding: 10px;
+      border-radius: 12px;
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(8px);
+    }
+
     .controls {
-      display: flex;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: 1fr;
       gap: 8px;
-      align-items: center;
     }
 
     button {
       border: 1px solid #c9d3dc;
-      border-radius: 7px;
+      border-radius: 9px;
       background: #f7f8fa;
       color: #172b3a;
-      font-weight: 650;
-      padding: 7px 10px;
+      font-weight: 700;
+      padding: 8px 10px;
       cursor: pointer;
       font: inherit;
+      min-height: 38px;
     }
 
     button:hover {
@@ -195,6 +211,7 @@
       color: #005a92;
       font-weight: 850;
       font-size: 12px;
+      line-height: 1.3;
     }
 
     #credit-footer {
@@ -222,27 +239,35 @@
 
     @media (max-width: 1050px) {
       #hud {
+        right: 10px;
         grid-template-columns: 1fr;
-        max-height: 46vh;
+        max-height: 45vh;
         overflow-y: auto;
       }
 
+      #controls-panel {
+        top: auto;
+        right: 10px;
+        left: 10px;
+        bottom: 34px;
+        width: auto;
+      }
+
+      .controls {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
       .cards {
-        grid-template-columns: repeat(2, minmax(120px, 1fr));
+        grid-template-columns: repeat(4, minmax(100px, 1fr));
+        overflow-x: auto;
       }
 
       .metrics {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(7, minmax(70px, 1fr));
+        overflow-x: auto;
       }
     }
 
-    /*
-      Mobile layout:
-      - The 3D scene stays full-screen.
-      - The HUD becomes compact at the top.
-      - The controls become a bottom game-like control pad.
-      - Metrics stay readable without covering the entire scene.
-    */
     @media (max-width: 768px) {
       html,
       body {
@@ -255,7 +280,7 @@
         left: 8px;
         right: 8px;
         display: block;
-        max-height: 42vh;
+        max-height: 26vh;
         overflow-y: auto;
         padding: 10px;
         border-radius: 14px;
@@ -264,13 +289,11 @@
 
       #hud h1 {
         font-size: 16px;
-        margin-bottom: 4px;
+        margin-bottom: 3px;
       }
 
       #hud p {
-        font-size: 12px;
-        line-height: 1.25;
-        margin-bottom: 6px;
+        display: none;
       }
 
       #mode-badge {
@@ -280,7 +303,7 @@
 
       #narrative {
         font-size: 11px;
-        min-height: 16px;
+        min-height: 14px;
         margin-top: 6px;
       }
 
@@ -289,8 +312,7 @@
       }
 
       .cards {
-        display: grid;
-        grid-template-columns: repeat(4, minmax(94px, 1fr));
+        grid-template-columns: repeat(4, minmax(84px, 1fr));
         overflow-x: auto;
         gap: 6px;
         padding-bottom: 4px;
@@ -304,25 +326,25 @@
       }
 
       .metric-card {
-        min-width: 94px;
-        padding: 6px;
+        min-width: 84px;
+        padding: 5px 6px;
+        min-height: 36px;
       }
 
       .metric-label {
-        font-size: 10px;
+        font-size: 9px;
       }
 
       .metric-value {
-        font-size: 13px;
+        font-size: 12px;
       }
 
       .metrics {
-        display: grid;
-        grid-template-columns: repeat(6, minmax(68px, 1fr));
+        grid-template-columns: repeat(7, minmax(58px, 1fr));
         overflow-x: auto;
         gap: 6px;
         padding-bottom: 4px;
-        margin-top: 6px;
+        margin-top: 5px;
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none;
       }
@@ -332,87 +354,84 @@
       }
 
       .metrics div {
-        min-width: 68px;
+        min-width: 58px;
       }
 
       .metrics span {
-        font-size: 10px;
+        font-size: 9px;
       }
 
       .metrics strong {
-        font-size: 11px;
+        font-size: 10px;
+      }
+
+      #controls-panel {
+        top: auto;
+        left: 10px;
+        right: 10px;
+        bottom: calc(28px + env(safe-area-inset-bottom));
+        width: auto;
+        padding: 8px;
+        border-radius: 16px;
       }
 
       .controls {
-        position: fixed;
-        left: 8px;
-        right: 8px;
-        bottom: calc(30px + env(safe-area-inset-bottom));
-        z-index: 30;
         display: grid;
-        grid-template-columns: 1fr;
-        gap: 8px;
-        padding: 10px;
-        border-radius: 14px;
-        background: rgba(255, 255, 255, 0.94);
-        border: 1px solid var(--panel-border);
-        box-shadow: 0 8px 24px rgba(15, 36, 56, 0.18);
-        backdrop-filter: blur(8px);
+        grid-template-columns: repeat(3, 1fr);
+        gap: 7px;
       }
 
       button {
         width: 100%;
-        min-height: 44px;
-        font-size: 14px;
-        border-radius: 10px;
+        min-height: 42px;
+        font-size: 11.5px;
+        line-height: 1.15;
+        padding: 8px 6px;
+        border-radius: 12px;
       }
 
       #status {
-        position: fixed;
-        left: 10px;
-        right: 10px;
-        bottom: calc(184px + env(safe-area-inset-bottom));
-        z-index: 31;
-        margin: 0;
-        padding: 6px 8px;
-        border-radius: 8px;
-        background: rgba(255, 255, 255, 0.92);
-        border: 1px solid var(--panel-border);
-        box-shadow: 0 4px 14px rgba(15, 36, 56, 0.10);
+        margin-top: 7px;
+        padding: 0 2px;
         font-size: 11px;
+        text-align: center;
       }
 
       #credit-footer {
-        bottom: calc(6px + env(safe-area-inset-bottom));
-        font-size: 11px;
+        bottom: calc(5px + env(safe-area-inset-bottom));
+        font-size: 10.5px;
+        opacity: 0.78;
       }
     }
 
     @media (max-width: 420px) {
       #hud {
-        max-height: 38vh;
+        max-height: 24vh;
       }
 
-      .controls {
-        bottom: calc(28px + env(safe-area-inset-bottom));
+      .metric-card {
+        min-width: 78px;
       }
 
-      #status {
-        bottom: calc(182px + env(safe-area-inset-bottom));
+      button {
+        font-size: 11px;
       }
     }
 
     @media (orientation: landscape) and (max-height: 520px) {
       #hud {
-        max-height: 36vh;
+        max-height: 34vh;
+        right: 44%;
+      }
+
+      #controls-panel {
+        left: 58%;
+        right: 8px;
+        bottom: calc(8px + env(safe-area-inset-bottom));
       }
 
       .controls {
-        grid-template-columns: repeat(3, 1fr);
-      }
-
-      #status {
-        bottom: calc(88px + env(safe-area-inset-bottom));
+        grid-template-columns: 1fr;
       }
     }
   </style>
@@ -427,8 +446,11 @@
       <div id="narrative">😊 Aligned</div>
       <div class="alignment-row">
         <span>😊 Aligned</span>
-        <div id="alignment-bar"><div id="alignment-fill"></div></div>
-        <span>🫣 Misaligned</span>
+        <div id="alignment-bar">
+          <div id="annoyance-bar"></div>
+          <div id="alignment-fill" aria-hidden="true"></div>
+        </div>
+        <span>🫣 Misaligned <strong id="val-annoyance">0%</strong></span>
       </div>
     </section>
 
@@ -461,15 +483,15 @@
         <div><span>Time</span><strong id="val-time">08:00</strong></div>
       </div>
     </section>
+  </div>
 
-    <section>
-      <div class="controls">
-        <button id="shadeBtn">Lower shade</button>
-        <button id="thermBtn">Change thermostat</button>
-        <button id="lightBtn">Dim lights</button>
-      </div>
-      <div id="status">Status: waiting for interaction</div>
-    </section>
+  <div id="controls-panel">
+    <div class="controls">
+      <button id="shadeBtn">Lower shade</button>
+      <button id="thermBtn">Thermostat</button>
+      <button id="lightBtn">Dim lights</button>
+    </div>
+    <div id="status">Status: waiting for interaction</div>
   </div>
 
   <footer id="credit-footer">
