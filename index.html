@@ -427,7 +427,7 @@
       <div class="alignment-row">
         <span>😊 Aligned</span>
         <div id="alignment-bar">
-          <div id="annoyance-bar"><div id="alignment-fill"></div></div>
+          <div id="annoyance-bar"></div>
         </div>
         <span>🫣 Misaligned <strong id="val-annoyance">0%</strong></span>
       </div>
@@ -490,93 +490,5 @@
   </script>
 
   <script type="module" src="./src/main.js"></script>
-
-  <script>
-    /*
-      UI consistency layer.
-      This script only normalises user-facing text. It does not change the
-      simulation logic in src/main.js. The goal is to avoid inconsistent labels:
-      - Shade button changes between Lower/Raise.
-      - Lights are strictly On/Off, not "dim".
-      - Thermostat is Warm/Cool, not an AC on/off service.
-      - AC card is hidden because AC is not an independent service in this UI.
-    */
-    (function () {
-      const $ = (id) => document.getElementById(id);
-
-      function parseNumber(text) {
-        const match = String(text || '').match(/-?\d+(\.\d+)?/);
-        return match ? Number(match[0]) : NaN;
-      }
-
-      function normaliseUI() {
-        const shadeVal = $('val-shade');
-        const thermVal = $('val-therm');
-        const lightsVal = $('val-lights');
-        const acVal = $('val-ac');
-        const shadeBtn = $('shadeBtn');
-        const thermBtn = $('thermBtn');
-        const lightBtn = $('lightBtn');
-        const narrative = $('narrative');
-
-        // Shade: express as Up/Down and set the next available action.
-        let shadeText = shadeVal ? shadeVal.textContent.trim() : '';
-        let shadeNumber = parseNumber(shadeText);
-        let shadeIsDown =
-          /down/i.test(shadeText) ||
-          (!Number.isNaN(shadeNumber) && shadeNumber >= 50);
-
-        if (shadeVal) shadeVal.textContent = shadeIsDown ? 'Down' : 'Up';
-        if (shadeBtn) shadeBtn.textContent = shadeIsDown ? 'Raise shade' : 'Lower shade';
-
-        // Lights: strict On/Off service. No "dim" language in user-facing UI.
-        let lightsText = lightsVal ? lightsVal.textContent.trim() : '';
-        let lightsAreOn = !/off/i.test(lightsText);
-        if (lightsVal) lightsVal.textContent = lightsAreOn ? 'On' : 'Off';
-        if (lightBtn) lightBtn.textContent = lightsAreOn ? 'Turn lights off' : 'Turn lights on';
-
-        // Thermostat: present as thermal direction, not as AC control.
-        // The existing model may expose a numeric setpoint; map it to Cool/Neutral/Warm.
-        let thermText = thermVal ? thermVal.textContent.trim() : '';
-        let setpoint = parseNumber(thermText);
-        let thermState = 'Neutral';
-
-        if (/cool|cold/i.test(thermText)) thermState = 'Cool';
-        if (/warm|heat|hot/i.test(thermText)) thermState = 'Warm';
-
-        if (!Number.isNaN(setpoint)) {
-          if (setpoint <= 21.0) thermState = 'Cool';
-          else if (setpoint >= 23.0) thermState = 'Warm';
-          else thermState = 'Neutral';
-        }
-
-        if (thermVal) thermVal.textContent = thermState;
-        if (thermBtn) thermBtn.textContent = thermState === 'Warm' ? 'Make cooler' : 'Make warmer';
-
-        // AC is not an independent service in the game. Keep compatibility field empty.
-        if (acVal) acVal.textContent = '';
-
-        if (narrative && narrative.textContent.toLowerCase().includes('ac')) {
-          narrative.textContent = narrative.textContent.replace(/\bAC\b/g, 'thermostat');
-        }
-      }
-
-      // Use both MutationObserver and requestAnimationFrame because src/main.js updates
-      // these fields continuously.
-      const observer = new MutationObserver(() => normaliseUI());
-      window.addEventListener('DOMContentLoaded', () => {
-        ['val-shade', 'val-therm', 'val-lights', 'val-ac'].forEach((id) => {
-          const el = $(id);
-          if (el) observer.observe(el, { childList: true, subtree: true, characterData: true });
-        });
-
-        function loop() {
-          normaliseUI();
-          requestAnimationFrame(loop);
-        }
-        loop();
-      });
-    })();
-  </script>
 </body>
 </html>
