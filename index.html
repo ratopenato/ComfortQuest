@@ -164,13 +164,6 @@
       margin-top: 2px;
     }
 
-    .controls {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      align-items: center;
-    }
-
     button {
       border: 1px solid #c9d3dc;
       border-radius: 7px;
@@ -196,8 +189,49 @@
       transform: none;
     }
 
-    #status {
+    /* ------------------------------------------------------------
+       Fixed bottom control panel.
+       This is intentionally outside #hud in the HTML.
+       It sits above the developer credit on desktop and mobile.
+    ------------------------------------------------------------ */
+
+    #control-panel {
+      position: fixed;
+      left: 50%;
+      bottom: calc(34px + env(safe-area-inset-bottom));
+      transform: translateX(-50%);
+      z-index: 40;
+
+      width: min(520px, calc(100vw - 24px));
+      padding: 12px;
+      border-radius: 14px;
+
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid rgba(15, 36, 56, 0.12);
+      box-shadow: 0 10px 28px rgba(15, 36, 56, 0.18);
+      backdrop-filter: blur(8px);
+    }
+
+    #control-panel .controls {
+      position: static !important;
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      padding: 0;
+      background: transparent;
+      border: 0;
+      box-shadow: none;
+      backdrop-filter: none;
+    }
+
+    #control-panel #status {
+      position: static !important;
       margin-top: 8px;
+      padding: 0;
+      background: transparent;
+      border: 0;
+      box-shadow: none;
+      text-align: center;
       color: #005a92;
       font-weight: 850;
       font-size: 12px;
@@ -205,7 +239,7 @@
 
     #credit-footer {
       position: fixed;
-      bottom: 8px;
+      bottom: calc(8px + env(safe-area-inset-bottom));
       left: 0;
       width: 100%;
       text-align: center;
@@ -254,7 +288,7 @@
         left: 8px;
         right: 8px;
         display: block;
-        max-height: 42vh;
+        max-height: 36vh;
         overflow-y: auto;
         padding: 10px;
         border-radius: 14px;
@@ -341,103 +375,57 @@
       .metrics strong {
         font-size: 11px;
       }
-    }
 
-    @media (max-width: 420px) {
-      #hud {
-        max-height: 38vh;
-      }
-    }
-
-    @media (orientation: landscape) and (max-height: 520px) {
-      #hud {
-        max-height: 36vh;
-      }
-    }
-
-    /* ------------------------------------------------------------
-       Bottom control panel — desktop and mobile.
-       This section contains the three buttons and the status line.
-       It is pulled out of the top HUD and fixed at the bottom.
-    ------------------------------------------------------------ */
-
-    #hud > section:last-child {
-      position: fixed;
-      left: 50%;
-      bottom: calc(34px + env(safe-area-inset-bottom));
-      transform: translateX(-50%);
-      z-index: 40;
-
-      width: min(520px, calc(100vw - 24px));
-      padding: 12px;
-      border-radius: 14px;
-
-      background: rgba(255, 255, 255, 0.94);
-      border: 1px solid rgba(15, 36, 56, 0.12);
-      box-shadow: 0 10px 28px rgba(15, 36, 56, 0.18);
-      backdrop-filter: blur(8px);
-    }
-
-    #hud > section:last-child .controls {
-      position: static !important;
-      display: flex;
-      justify-content: center;
-      gap: 8px;
-      padding: 0;
-      background: transparent;
-      border: 0;
-      box-shadow: none;
-      backdrop-filter: none;
-    }
-
-    #hud > section:last-child #status {
-      position: static !important;
-      margin-top: 8px;
-      padding: 0;
-      background: transparent;
-      border: 0;
-      box-shadow: none;
-      text-align: center;
-      font-size: 12px;
-    }
-
-    @media (max-width: 768px) {
-      #hud > section:last-child {
+      #control-panel {
         left: 8px;
         right: 8px;
-        bottom: calc(28px + env(safe-area-inset-bottom));
+        bottom: calc(34px + env(safe-area-inset-bottom));
         transform: none;
         width: auto;
         padding: 10px;
       }
 
-      #hud > section:last-child .controls {
+      #control-panel .controls {
         display: grid;
         grid-template-columns: 1fr;
         gap: 8px;
       }
 
-      #hud > section:last-child button {
+      #control-panel button {
         width: 100%;
         min-height: 44px;
         font-size: 14px;
         border-radius: 10px;
       }
 
-      #hud > section:last-child #status {
+      #control-panel #status {
         text-align: left;
         font-size: 11px;
       }
     }
 
-    @media (orientation: landscape) and (max-height: 520px) {
-      #hud > section:last-child {
-        bottom: calc(28px + env(safe-area-inset-bottom));
+    @media (max-width: 420px) {
+      #hud {
+        max-height: 34vh;
       }
 
-      #hud > section:last-child .controls {
-        grid-template-columns: repeat(3, 1fr);
+      #control-panel {
+        bottom: calc(34px + env(safe-area-inset-bottom));
+      }
+    }
+
+    @media (orientation: landscape) and (max-height: 520px) {
+      #hud {
+        max-height: 34vh;
+      }
+
+      #control-panel {
+        bottom: calc(30px + env(safe-area-inset-bottom));
+      }
+
+      #control-panel .controls {
         display: grid;
+        grid-template-columns: repeat(3, 1fr);
       }
     }
   </style>
@@ -450,6 +438,7 @@
       <p>🤖 Control shade, thermostat, and lights. Keep the occupant comfortable by avoiding unnecessary overrides.</p>
       <div id="mode-badge">🎮 YOU ARE THE AUTOMATION</div>
       <div id="narrative">😊 Services aligned with the occupant.</div>
+
       <div class="alignment-row">
         <span>😊 Aligned</span>
         <div id="alignment-bar">
@@ -465,14 +454,17 @@
           <div class="metric-label">🪟 Shade</div>
           <div class="metric-value" id="val-shade">Up</div>
         </div>
+
         <div class="metric-card" id="card-therm">
           <div class="metric-label">🌡 Thermostat</div>
           <div class="metric-value" id="val-therm">Neutral</div>
         </div>
+
         <div class="metric-card" id="card-lights">
           <div class="metric-label">💡 Lights</div>
           <div class="metric-value" id="val-lights">On</div>
         </div>
+
         <div class="metric-card" id="card-ac" aria-hidden="true">
           <div class="metric-label">Hidden compatibility field</div>
           <div class="metric-value" id="val-ac"></div>
@@ -488,15 +480,15 @@
         <div><span>Time</span><strong id="val-time">08:00</strong></div>
       </div>
     </section>
+  </div>
 
-    <section>
-      <div class="controls">
-        <button id="shadeBtn">Lower shade</button>
-        <button id="thermBtn">Make warmer</button>
-        <button id="lightBtn">Turn lights off</button>
-      </div>
-      <div id="status">Status: waiting for interaction</div>
-    </section>
+  <div id="control-panel">
+    <div class="controls">
+      <button id="shadeBtn">Lower shade</button>
+      <button id="thermBtn">Make warmer</button>
+      <button id="lightBtn">Turn lights off</button>
+    </div>
+    <div id="status">Status: waiting for interaction</div>
   </div>
 
   <footer id="credit-footer">
